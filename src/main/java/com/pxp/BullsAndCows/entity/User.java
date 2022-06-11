@@ -1,23 +1,18 @@
 package com.pxp.BullsAndCows.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class User {
-
     @Id
     private int userId;
 
     private String nickname;
 
-    @OneToMany
-    @JoinColumn(name = "gameId")
-    private List<Game> gameId = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Game> games = new ArrayList<>();
 
     public User(){}
 
@@ -37,12 +32,12 @@ public class User {
         this.nickname = nickname;
     }
 
-    public List<Game> getGameId() {
-        return gameId;
+    public List<Game> getGames() {
+        return games;
     }
 
-    public void setGameId(List<Game> gameId) {
-        this.gameId = gameId;
+    public void setGames(List<Game> gameId) {
+        this.games = gameId;
     }
 
     @Override
@@ -50,7 +45,7 @@ public class User {
         return "User{" +
                 "id=" + userId +
                 ", nickname='" + nickname + '\'' +
-                ", gameId=" + gameId +
+                ", games=" + games.size() +
                 '}';
     }
 }

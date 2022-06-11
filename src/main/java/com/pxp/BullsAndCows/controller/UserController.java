@@ -1,48 +1,67 @@
 package com.pxp.BullsAndCows.controller;
 
+import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.entity.User;
+import com.pxp.BullsAndCows.repository.UserRepository;
 import com.pxp.BullsAndCows.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
-    @RequestMapping(value = "info", method = RequestMethod.GET)
-    public String info() {
-        return "The application is up...";
+    public UserController(UserService userService, UserRepository userRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
-    @RequestMapping(value = "addUser", method = RequestMethod.POST)
-    public String createUser(@RequestBody User user) {
+    @PostMapping
+    public User addUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    @RequestMapping(value = "readUsers", method = RequestMethod.GET)
-    public List<User> readUsers() {
-        return userService.readUser();
+    @GetMapping
+    public List<User> getUsers() {
+        return userService.getUsers();
     }
 
-    @RequestMapping(value = "updateUser", method = RequestMethod.PUT)
-    public String updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    @GetMapping("game/{id}")
+    public List<Game> getGames(@PathVariable Long id) {
+        List<Game> games = new ArrayList<>();
+        userRepository.
+                findAll().
+                forEach(user -> {
+                    if (user.getId() == id)
+                        games.addAll(user.getGames());
+                });
+
+        return games;
     }
 
-    @RequestMapping(value = "addGame", method = RequestMethod.POST)
-    public void addGame(@RequestBody User user) {
-        userService.createGame(user);
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return userService.get(id);
     }
 
-    @RequestMapping(value = "deleteUser", method = RequestMethod.DELETE)
-    public String deleteUser(@RequestBody User user) {
-        return userService.deleteUser(user);
+    @PutMapping("/{id}")
+    public ResponseEntity updateUser(@PathVariable Long id, @RequestBody User user) {
+        return userService.updateUser(id, user);
+    }
+
+    @PostMapping("addGame/{id}")
+    public ResponseEntity addGame(@PathVariable Long id) {
+        return userService.addGame(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteUser(@PathVariable Long id) {
+        return userService.deleteUser(id);
     }
 }

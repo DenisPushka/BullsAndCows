@@ -1,9 +1,6 @@
 package com.pxp.BullsAndCows.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,8 +13,7 @@ public class Game {
 
     private String trueComb;
 
-    @OneToMany
-    @JoinColumn(name = "combinationId")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Combination> combination = new ArrayList<>();
 
     public Game() {
@@ -51,8 +47,11 @@ public class Game {
     private String CreateTrueCombination() {
         var combination = "";
         var rnd = new Random();
-        while (combination.length() != 4)
-            combination += rnd.nextInt(10);
+        while (combination.length() != 4) {
+            var r = rnd.nextInt(10);
+            if (combination.indexOf(r) == -1)
+                combination += r;
+        }
 
         return combination;
     }

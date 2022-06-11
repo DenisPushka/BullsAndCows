@@ -16,12 +16,9 @@ public class Combination {
 
     private Date timeOfGame;
 
-    @OneToOne
+ /*   @OneToOne
     @JoinColumn(name = "userId")
-    private User userId;
-
-    public Combination() {
-    }
+    private User userId;*/
 
     public int getCombinationId() {
         return combinationId;
@@ -47,21 +44,13 @@ public class Combination {
         this.timeOfGame = timeOfGame;
     }
 
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
     @Override
     public String toString() {
         return "Combination{" +
                 "combinationId=" + combinationId +
                 ", combStep='" + combStep + '\'' +
                 ", timeOfGame=" + timeOfGame +
-                ", userId=" + userId +
+                // ", userId=" + userId +
                 '}';
     }
 }

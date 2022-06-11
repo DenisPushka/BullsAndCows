@@ -2,36 +2,43 @@ package com.pxp.BullsAndCows.controller;
 
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.service.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/game")
 public class GameController {
-    @Autowired
-    private GameService gameService;
+    private final GameService gameService;
 
-    @RequestMapping(value = "infoGame", method = RequestMethod.GET)
-    public String info() {
-        return "The application is up infoGame...";
+    public GameController(GameService gameService) {
+        this.gameService = gameService;
     }
 
-    @RequestMapping(value = "createGame", method = RequestMethod.POST)
-    public String createGame(@RequestBody Game game){
-        return gameService.createGame(game);
+    @PostMapping
+    public ResponseEntity addGame(@RequestBody Game game) {
+        return gameService.addGame(game);
     }
 
-    @RequestMapping(value = "readGames", method = RequestMethod.GET)
-    public List<Game> readGames(){
-        return gameService.readGames();
+    @PostMapping( "addCombination/{id}")
+    public List<Game> addCombination(@PathVariable Long id) {return gameService.addCombination(id);}
+
+    @GetMapping
+    public List<Game> getGames() {
+        return gameService.getGames();
     }
 
-    @RequestMapping(value = "deleteGame", method = RequestMethod.DELETE)
-    public String deleteGame(@RequestBody Game game){
-        return gameService.deleteGame(game);
+    @GetMapping("/{id}")
+    public Game getGame(@PathVariable Long id){return gameService.getGame(id);}
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteGame(@PathVariable Long id) {
+        return gameService.deleteGame(id);
+    }
+
+    @DeleteMapping("/deleteAllGames")
+    public ResponseEntity deleteAllGames() {
+        return gameService.deleteAllGames();
     }
 }

@@ -2,26 +2,28 @@ package com.pxp.BullsAndCows.service;
 
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.repository.CombinationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 @Service
 public class CombinationService {
 
-    @Autowired
-    private CombinationRepository combinationRepository;
+    private final CombinationRepository combinationRepository;
+
+    public CombinationService(CombinationRepository combinationRepository) {
+        this.combinationRepository = combinationRepository;
+    }
 
     @Transactional
-    public String createCombination(Combination combination) {
-        try {
-            combinationRepository.save(combination);
-            return "Combination record created successfully.";
-        } catch (Exception e) {
-            throw e;
-        }
+    public ResponseEntity addCombination(Combination combination) {
+        combination.setTimeOfGame(new Date());
+        combination.setCombinationId(combinationRepository.findMaxId() + 1);
+        var newCombination = combinationRepository.save(combination);
+        return ResponseEntity.ok(newCombination);
     }
 
     public List<Combination> readCombination() {
@@ -29,15 +31,13 @@ public class CombinationService {
     }
 
     @Transactional
-    public void deleteCombination(Combination combination) {
-        try {
-            var combinations = combinationRepository.findAll();
-            combinations.stream().forEach(s -> {
-                if (combination.getCombinationId() == s.getCombinationId())
-                    combinationRepository.delete(s);
-            });
-        } catch (Exception e) {
-            throw e;
-        }
+    public void deleteAllCombinations() {
+        combinationRepository.deleteAll();
+    }
+
+    @Transactional
+    public ResponseEntity deleteCombination(Long id) {
+        combinationRepository.deleteById(Math.toIntExact(id));
+        return ResponseEntity.ok().build();
     }
 }

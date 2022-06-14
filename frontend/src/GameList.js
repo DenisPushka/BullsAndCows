@@ -11,8 +11,11 @@ class GameList extends Component {
             {
                 gameId: 0,
                 trueComb: '',
-                combination:[
-
+                combination: [
+                    {
+                        combinationId: 0,
+                        combStep: ''
+                    }
                 ]
             }
         ]
@@ -23,27 +26,27 @@ class GameList extends Component {
         this.state = {
             item: this.emptyItem
         };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.update = this.update.bind(this)
+        // this.handleChange = this.handleChange.bind(this);
+        // this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     async componentDidMount() {
-        if (this.props.match.params.id !== 'new') {
-            const users = await (await fetch(`/user/${this.props.match.params.id}`)).json();
-            this.setState({item: users});
-        }
+        const user = await (await fetch(`/user/${this.props.match.params.id}`)).json();
+        this.setState({item: user});
+
     }
 
-    async handleChange(event) {
-        const target = event.target;
-        const value = target.value;
-        const nickname = target.nickname;
-        let item = {...this.state.item};
-        item[nickname] = value;
-        this.setState({item});
-    }
+    // async handleChange(event) {
+    //     const target = event.target;
+    //     const value = target.value;
+    //     const nickname = target.nickname;
+    //     let item = {...this.state.item};
+    //     item[nickname] = value;
+    //     this.setState({item});
+    // }
 
-    async update(item){
+    async update(item) {
         console.log(item)
         const buff = await fetch(`/user/addGame/${item.id}`, {
             method: 'POST',
@@ -62,37 +65,34 @@ class GameList extends Component {
                 })
         })
         console.log(buff)
-        this.props.history.push(`/game/${buff.id}`)
+        this.props.history.push(`/game/` + buff.gameId)
     }
 
     // Не использую, оставил на всякий случай
-    async handleSubmit(event) {
-        event.preventDefault();
-        const {item} = this.state.target.value;
-
-        await fetch('/user' + (item.id ? '/' + item.id : ''), {
-            method: (item.id) ? 'PUT' : 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(item),
-        });
-        this.props.history.push('/user');
-    }
+    // async handleSubmit(event) {
+    //
+    //     event.preventDefault();
+    //     const {item} = this.state.target.value;
+    //
+    //     await fetch('/user' + (item.id ? '/' + item.id : ''), {
+    //         method: (item.id) ? 'PUT' : 'POST',
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify(item),
+    //     });
+    //     this.props.history.push('/user');
+    // }
 
     render() {
         const {item} = this.state;
-        console.log(item)
         const gameList = item.games.map(game => {
             return <tr key={game.id}>
                 <td style={{whiteSpace: 'nowrap'}} width="30%">№{game.gameId}</td>
                 <td width="40%">True combination = {game.trueComb}</td>
-                {/*<td width={"60%"}>Комбинации = {game.combination.map(*/}
-                {/*    comb=>{*/}
-                {/*        comb*/}
-                {/*    }*/}
-                {/*)}</td>*/}
+                <td width={"60%"}>Комбинации = {game.combination}
+                </td>
             </tr>
         })
 
@@ -107,7 +107,8 @@ class GameList extends Component {
                     {gameList}
                     </tbody>
                     <FormGroup>
-                        <Button color="primary" type="submit" tag={Link} to={this.update(item)}>Играть</Button>{' '}
+                        <Button color="primary" type="submit" tag={Link}
+                                onClick={this.update(item)}>Играть</Button>
                     </FormGroup>
                 </Form>
             </Container>

@@ -33,17 +33,34 @@ public class GameService {
         return gameRepository.findAll();
     }
 
-    public Game getGame(Long id){
+    public List<Combination> getCombinations(Long id) {
+        return getGame(id).getCombination();
+    }
+
+    public Game getGame(Long id) {
         return gameRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
     }
 
     @Transactional
-    public List<Game> addCombination(Long id){
+    public String addCombination(Long id, String comb) {
         var combination = new Combination();
+        combination.setCombStep(comb);
         combinationService.addCombination(combination);
         var game = getGame(id);
         game.getCombination().add(combination);
-        return gameRepository.findAll();
+        updateGame(id, game);
+
+        return game.processing(comb);
+    }
+
+    @Transactional
+    public ResponseEntity updateGame(Long id, Game game) {
+        var currentGame = gameRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
+        currentGame.setTrueComb(game.getTrueComb());
+        currentGame.setCombination(game.getCombination());
+        currentGame = gameRepository.save(game);
+
+        return ResponseEntity.ok(currentGame);
     }
 
     @Transactional
@@ -53,7 +70,7 @@ public class GameService {
     }
 
     @Transactional
-    public ResponseEntity deleteAllGames(){
+    public ResponseEntity deleteAllGames() {
         gameRepository.deleteAll();
         return ResponseEntity.ok().build();
     }

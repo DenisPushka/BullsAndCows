@@ -1,5 +1,6 @@
 package com.pxp.BullsAndCows.controller;
 
+import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.service.GameService;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +23,20 @@ public class GameController {
     }
 
     @PostMapping( "addCombination/{id}")
-    public List<Game> addCombination(@PathVariable Long id) {return gameService.addCombination(id);}
+    public String addCombination(@PathVariable Long id,@RequestBody String combination) {return gameService.addCombination(id, combination);}
 
     @GetMapping
     public List<Game> getGames() {
         return gameService.getGames();
     }
 
+    @GetMapping("/getComb/{id}")
+    public List<Combination> getCombinations(@PathVariable Long id) {
+        return gameService.getCombinations(id);
+    }
+
     @GetMapping("/{id}")
-    public Game getGame(@PathVariable Long id){return gameService.getGame(id);}
+    public Game getLastGame(@PathVariable Long id){return gameService.getGame(id);}
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteGame(@PathVariable Long id) {

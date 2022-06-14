@@ -1,6 +1,9 @@
 package com.pxp.BullsAndCows.entity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -45,15 +48,26 @@ public class Game {
     }
 
     private String CreateTrueCombination() {
-        var combination = "";
+        StringBuilder combination = new StringBuilder();
         var rnd = new Random();
         while (combination.length() != 4) {
             var r = rnd.nextInt(10);
-            if (combination.indexOf(r) == -1)
-                combination += r;
+            if (!combination.toString().contains(Integer.toString(r)))
+                combination.append(r);
         }
 
-        return combination;
+        return combination.toString();
+    }
+
+    public String processing(String combination) {
+        int b = 0, k = 0;
+        for (var i = 0; i < trueComb.length(); i++)
+            if (trueComb.charAt(i) == combination.charAt(i))
+                b++;
+            else if (combination.indexOf(trueComb.charAt(i)) != -1)
+                k++;
+
+        return "\"" + b + "Б" + k + "К\"";
     }
 
     @Override

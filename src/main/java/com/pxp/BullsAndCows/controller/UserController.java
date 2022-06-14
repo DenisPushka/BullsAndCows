@@ -50,13 +50,16 @@ public class UserController {
         return userService.get(id);
     }
 
+//    @GetMapping("/getLastGame/{id}")
+//    public Game getLastGame(@PathVariable Long id){return userService.getLastGame(id);}
+
     @PutMapping("/{id}")
     public ResponseEntity updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
     @PostMapping("addGame/{id}")
-    public ResponseEntity addGame(@PathVariable Long id) {
+    public Game addGame(@PathVariable Long id) {
         return userService.addGame(id);
     }
 

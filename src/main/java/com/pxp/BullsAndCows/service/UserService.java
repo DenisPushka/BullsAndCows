@@ -23,8 +23,10 @@ public class UserService {
 
     @Transactional
     public User createUser(User user) {
-        if (userRepository.existsByNickname(user.getNickname()))
-            return user;
+        if (userRepository.existsByNickname(user.getNickname())) {
+            var buff = userRepository.findByNickname(user.getNickname());
+            return buff.get(0);
+        }
 
         user.setId(userRepository.findMaxId() + 1);
         var newUser = userRepository.save(user);
@@ -40,13 +42,13 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity addGame(Long id) {
+    public Game addGame(Long id) {
         var game = new Game();
         gameService.addGame(game);
         var user = get(id);
         user.getGames().add(game);
-        // updateUser(id, user);
-        return ResponseEntity.ok().build();
+        updateUser(id, user);
+        return game;
     }
 
     @Transactional
@@ -58,6 +60,13 @@ public class UserService {
 
         return ResponseEntity.ok(currentUser);
     }
+
+//    @Transactional
+//    public Game getLastGame(Long id){
+//        var user = get(id);
+//        var size = user.getGames().size() - 1;
+//       return user.getGames().get(size);
+//    }
 
     @Transactional
     public ResponseEntity deleteUser(Long id) {

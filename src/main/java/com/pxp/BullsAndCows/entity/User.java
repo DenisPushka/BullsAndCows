@@ -41,6 +41,7 @@ public class User {
     }
 
     public String averageCombTime() {
+        if (games.size() == 0) return "\"00:00:00\"";
         long seconds = 0;
         for (var game: games) {
             var max = game.getCombination().size() - 1;

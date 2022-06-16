@@ -72,9 +72,7 @@ public class UserService {
             var g = game.get(i);
             gameService.deleteGame((long) g.getGameId());
         }
-        var u = get(id);
         userRepository.save(get(id));
-        var u1 = get(id);
         userRepository.deleteById(Math.toIntExact(id));
         return ResponseEntity.ok().build();
     }

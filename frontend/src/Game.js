@@ -1,12 +1,11 @@
 import React, {Component} from 'react'
 import './App.css'
-import {Navbar, NavbarBrand} from "reactstrap"
+import {Button, Navbar, NavbarBrand} from "reactstrap"
 import {Link, withRouter} from "react-router-dom"
 
 
 function Greeting(props) {
-    const isWine = props.isWine;
-    return isWine ? <div> Вы выиграли! </div> : <div> {props.cmb} </div>;
+    return props.isWine;
 }
 
 class Game extends Component {
@@ -71,12 +70,8 @@ class Game extends Component {
         this.state.isWine = buff[0] === "4";
     }
 
-    renderValidate() {
-        return <div> Вы выиграли! </div>
-    }
-
-    renderNotValidate() {
-        return <div> {this.state.cmb} </div>
+    win() {
+        this.props.history.push(`/`)
     }
 
     render() {
@@ -107,8 +102,12 @@ class Game extends Component {
                     </label>
                     <input type="submit" value="Enter"/>
                 </form>
+
                 <Greeting isWine={isWine}/>
-                <p align={"center"}>Результат: {isWine ? this.renderValidate() : this.renderNotValidate()} </p>
+                <p align={"center"}>Результат: {isWine ? <h2> Вы выиграли!</h2> : <h2> {this.state.cmb} </h2>} </p>
+
+                <Button aria-valuetext={"center"} color="primary" type="submit" tag={Link}
+                        onClick={() => this.win()}>Выйти из игры</Button>
             </div>
         )
     }

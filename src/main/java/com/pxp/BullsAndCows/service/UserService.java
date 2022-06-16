@@ -27,10 +27,13 @@ public class UserService {
             var buff = userRepository.findByNickname(user.getNickname());
             return buff.get(0);
         }
+        else if (userRepository.findAll().size() == 0){
+            user.setId(0);
+            return userRepository.save(user);
+        }
 
         user.setId(userRepository.findMaxId() + 1);
-        var newUser = userRepository.save(user);
-        return newUser;
+        return userRepository.save(user);
     }
 
     public List<User> getUsers() {
@@ -44,6 +47,7 @@ public class UserService {
     @Transactional
     public Game addGame(Long id) {
         var game = new Game();
+        game.setIdG(get(id).getGames().size());
         gameService.addGame(game);
         var user = get(id);
         user.getGames().add(game);
@@ -61,13 +65,6 @@ public class UserService {
         return ResponseEntity.ok(currentUser);
     }
 
-//    @Transactional
-//    public Game getLastGame(Long id){
-//        var user = get(id);
-//        var size = user.getGames().size() - 1;
-//       return user.getGames().get(size);
-//    }
-
     @Transactional
     public ResponseEntity deleteUser(Long id) {
         var game = get(id).getGames();
@@ -80,5 +77,10 @@ public class UserService {
         var u1 = get(id);
         userRepository.deleteById(Math.toIntExact(id));
         return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    public String averageOfTime(Long id){
+        return get(id).averageCombTime();
     }
 }

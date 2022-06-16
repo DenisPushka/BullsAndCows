@@ -40,6 +40,23 @@ public class User {
         this.games = gameId;
     }
 
+    public String averageCombTime() {
+        long seconds = 0;
+        for (var game: games) {
+            var max = game.getCombination().size() - 1;
+            var hhmmss = game.getCombination().get(max).getTimeOfGame().split(":");
+            seconds += Integer.valueOf(hhmmss[0]) * 60 * 60;
+            seconds += Integer.valueOf(hhmmss[1]) * 60;
+            seconds += Integer.valueOf(hhmmss[2]);
+        }
+
+        seconds /= games.size();
+        long hh = seconds / 60 / 60;
+        long mm = (seconds / 60) % 60;
+        long ss = seconds % 60;
+        return String.format("\"%02d:%02d:%02d\"", hh,mm,ss);
+    }
+
     @Override
     public String toString() {
         return "User{" +

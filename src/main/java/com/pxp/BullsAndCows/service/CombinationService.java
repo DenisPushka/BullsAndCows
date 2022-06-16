@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -20,8 +19,10 @@ public class CombinationService {
 
     @Transactional
     public ResponseEntity addCombination(Combination combination) {
-        combination.setTimeOfGame(new Date());
-        combination.setCombinationId(combinationRepository.findMaxId() + 1);
+        if (combinationRepository.findMaxId() != null) {
+            combination.setCombinationId(combinationRepository.findMaxId() + 1);
+        }
+
         var newCombination = combinationRepository.save(combination);
         return ResponseEntity.ok(newCombination);
     }

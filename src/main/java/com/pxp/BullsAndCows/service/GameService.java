@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -44,13 +45,26 @@ public class GameService {
     @Transactional
     public String addCombination(Long id, String comb) {
         var combination = new Combination();
-        combination.setCombStep(comb);
-        combinationService.addCombination(combination);
         var game = getGame(id);
+        combination.setCombStep(comb);
+        var a = getTime(game);
+        combination.setTimeOfGame(a);
+        combinationService.addCombination(combination);
         game.getCombination().add(combination);
         updateGame(id, game);
 
         return game.processing(comb);
+    }
+
+    private String getTime(Game game) {
+        var stopWatch = new Date();
+        var hour = Integer.toString(Math.abs(stopWatch.getHours() - game.getStopWatch().getHours()));
+        if (hour.length() == 1) hour = "0" + hour;
+        var min = Integer.toString(Math.abs(stopWatch.getMinutes() - game.getStopWatch().getMinutes()));
+        if (min.length() == 1) min = "0" + min;
+        var sec = Integer.toString(Math.abs(stopWatch.getSeconds() - game.getStopWatch().getSeconds()));
+        if (sec.length() == 1) sec = "0" + sec;
+        return hour + ":" + min + ":" + sec;
     }
 
     @Transactional

@@ -10,11 +10,13 @@ class GameList extends Component {
         games: [
             {
                 gameId: 0,
+                idG: 0,
                 trueComb: '',
                 combination: [
                     {
                         combinationId: 0,
-                        combStep: ''
+                        combStep: '',
+                        timeOfGame: ''
                     }
                 ]
             }
@@ -24,29 +26,20 @@ class GameList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            item: this.emptyItem
+            item: this.emptyItem,
+            time: ''
         };
-        this.update = this.update.bind(this)
-        // this.handleChange = this.handleChange.bind(this);
-        // this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.averageTime()
+        this.addGame = this.addGame.bind(this)
     }
 
     async componentDidMount() {
         const user = await (await fetch(`/user/${this.props.match.params.id}`)).json();
         this.setState({item: user});
-
     }
 
-    // async handleChange(event) {
-    //     const target = event.target;
-    //     const value = target.value;
-    //     const nickname = target.nickname;
-    //     let item = {...this.state.item};
-    //     item[nickname] = value;
-    //     this.setState({item});
-    // }
-
-    async update(item) {
+    async addGame(item) {
         console.log(item)
         const buff = await fetch(`/user/addGame/${item.id}`, {
             method: 'POST',
@@ -68,33 +61,35 @@ class GameList extends Component {
         this.props.history.push(`/game/` + buff.gameId)
     }
 
-    // Не использую, оставил на всякий случай
-    // async handleSubmit(event) {
-    //
-    //     event.preventDefault();
-    //     const {item} = this.state.target.value;
-    //
-    //     await fetch('/user' + (item.id ? '/' + item.id : ''), {
-    //         method: (item.id) ? 'PUT' : 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify(item),
-    //     });
-    //     this.props.history.push('/user');
-    // }
+    async averageTime() {
+        const a = await fetch(`AverageTime/${this.props.match.params.id}`)
+            .then((response) => {
+            return response
+                .json()
+                .then((data) => {
+                    return data
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        });
+        console.log(a)
+        this.setState({time: a});
+    }
 
     render() {
         const {item} = this.state;
         const gameList = item.games.map(game => {
-            return <tr key={game.id}>
-                <td style={{whiteSpace: 'nowrap'}} width="30%">№{game.gameId}</td>
+            return <tr key={game.gameId}>
+                <td style={{whiteSpace: 'nowrap'}} width="40%">№{game.idG}</td>
                 <td width="40%">True combination = {game.trueComb}</td>
-                <td width={"60%"}>Комбинации = {game.combination}
-                </td>
+                <td width="60%">Кол-во комбинаций = {game.combination.length}</td>
             </tr>
         })
+
+        let averageComb = 0;
+        item.games.map(game => averageComb += game.combination.length)
+        averageComb /= item.games.length
 
         return <div>
             <AppNavbar/>
@@ -104,11 +99,17 @@ class GameList extends Component {
                         <Label for="name">Все игры</Label>
                     </FormGroup>
                     <tbody>
+
                     {gameList}
+
+                    <p align={"center"}> Среднее количество шагов = {averageComb}</p>
+
+                    <p align={"center"}>Среднее время прохождения: {this.state.time}</p>
+
                     </tbody>
                     <FormGroup>
                         <Button color="primary" type="submit" tag={Link}
-                                onClick={this.update(item)}>Играть</Button>
+                                onClick={() => this.addGame(item)}>Играть</Button>
                     </FormGroup>
                 </Form>
             </Container>

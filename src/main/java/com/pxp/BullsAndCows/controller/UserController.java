@@ -15,11 +15,8 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    private UserRepository userRepository;
-
-    public UserController(UserService userService, UserRepository userRepository) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -32,26 +29,10 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @GetMapping("game/{id}")
-    public List<Game> getGames(@PathVariable Long id) {
-        List<Game> games = new ArrayList<>();
-        userRepository.
-                findAll().
-                forEach(user -> {
-                    if (user.getId() == id)
-                        games.addAll(user.getGames());
-                });
-
-        return games;
-    }
-
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
         return userService.get(id);
     }
-
-//    @GetMapping("/getLastGame/{id}")
-//    public Game getLastGame(@PathVariable Long id){return userService.getLastGame(id);}
 
     @PutMapping("/{id}")
     public ResponseEntity updateUser(@PathVariable Long id, @RequestBody User user) {
@@ -62,6 +43,9 @@ public class UserController {
     public Game addGame(@PathVariable Long id) {
         return userService.addGame(id);
     }
+
+    @GetMapping("/AverageTime/{id}")
+    public String averageTime(@PathVariable Long id){return userService.averageOfTime(id);}
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id) {

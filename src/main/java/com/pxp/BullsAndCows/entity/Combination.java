@@ -2,8 +2,6 @@ package com.pxp.BullsAndCows.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import java.util.Date;
 
 @Entity
@@ -14,11 +12,7 @@ public class Combination {
 
     private String combStep;
 
-    private Date timeOfGame;
-
- /*   @OneToOne
-    @JoinColumn(name = "userId")
-    private User userId;*/
+    private String timeOfGame;
 
     public int getCombinationId() {
         return combinationId;
@@ -36,11 +30,11 @@ public class Combination {
         this.combStep = combStep;
     }
 
-    public Date getTimeOfGame() {
+    public String getTimeOfGame() {
         return timeOfGame;
     }
 
-    public void setTimeOfGame(Date timeOfGame) {
+    public void setTimeOfGame(String timeOfGame) {
         this.timeOfGame = timeOfGame;
     }
 

@@ -3,6 +3,12 @@ import './App.css'
 import {Navbar, NavbarBrand} from "reactstrap"
 import {Link, withRouter} from "react-router-dom"
 
+
+function Greeting(props) {
+    const isWine = props.isWine;
+    return isWine ? <div> Вы выиграли! </div> : <div> {props.cmb} </div>;
+}
+
 class Game extends Component {
     emptyItem = {
         gameId: 0,
@@ -18,9 +24,10 @@ class Game extends Component {
         super(props)
         this.state = {
             item: this.emptyItem,
-            value: ''
+            value: '',
+            isWine: false,
+            cmb: ''
         };
-        this.addGames = this.addGames.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleChange = this.handleChange.bind(this)
     }
@@ -30,34 +37,12 @@ class Game extends Component {
         this.setState({item: game});
     }
 
-    // возможно убрать
-    async addGames() {
-        const games = await (await fetch(`/game`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            }
-        }).then((response) => {
-            return response
-                .json()
-                .then((data) => {
-                    return data
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
-        }))
-        this.setState({item: games});
-    }
-
     async handleChange(event) {
         this.setState({value: event.target.value})
     }
 
     async handleSubmit(event) {
         event.preventDefault()
-
         const combination = {combStep: this.state.value}
         console.log(combination)
         const {item} = this.state
@@ -82,20 +67,24 @@ class Game extends Component {
         })
 
         console.log(buff)
-        if (buff[0] === "4") {
-            return <div>
-                Вы выиграли!
-            </div>
-        } else return <div>
-            {buff}
-        </div>
-
+        this.state.cmb = buff
+        this.state.isWine = buff[0] === "4";
     }
 
+    renderValidate() {
+        return <div> Вы выиграли! </div>
+    }
+
+    renderNotValidate() {
+        return <div> {this.state.cmb} </div>
+    }
 
     render() {
         const {item} = this.state
         console.log(item)
+        const isWine = this.state.isWine;
+        console.log(this.state.cmb)
+
         return (
             <div>
                 <Navbar color="dark" dark expand="md">
@@ -118,6 +107,8 @@ class Game extends Component {
                     </label>
                     <input type="submit" value="Enter"/>
                 </form>
+                <Greeting isWine={isWine}/>
+                <p align={"center"}>Результат: {isWine ? this.renderValidate() : this.renderNotValidate()} </p>
             </div>
         )
     }

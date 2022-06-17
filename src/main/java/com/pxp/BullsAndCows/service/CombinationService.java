@@ -2,7 +2,6 @@ package com.pxp.BullsAndCows.service;
 
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.repository.CombinationRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,13 +17,12 @@ public class CombinationService {
     }
 
     @Transactional
-    public ResponseEntity addCombination(Combination combination) {
-        if (combinationRepository.findMaxId() != null) {
+    public Combination addCombination(Combination combination) {
+        if (combinationRepository.findMaxId() != null)
             combination.setCombinationId(combinationRepository.findMaxId() + 1);
-        }
 
-        var newCombination = combinationRepository.save(combination);
-        return ResponseEntity.ok(newCombination);
+        combinationRepository.insertCombination(combination.getCombinationId(), combination.getCombStep(), combination.getTimeOfGame());
+        return combinationRepository.findCombinationById(combination.getCombinationId());
     }
 
     public List<Combination> readCombination() {
@@ -37,8 +35,8 @@ public class CombinationService {
     }
 
     @Transactional
-    public ResponseEntity deleteCombination(Long id) {
-        combinationRepository.deleteById(Math.toIntExact(id));
-        return ResponseEntity.ok().build();
+    public List<Combination> deleteCombination(Long id) {
+        combinationRepository.deleteById(id);
+        return combinationRepository.findAll();
     }
 }

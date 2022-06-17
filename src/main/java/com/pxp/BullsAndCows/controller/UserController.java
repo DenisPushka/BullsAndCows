@@ -2,12 +2,9 @@ package com.pxp.BullsAndCows.controller;
 
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.entity.User;
-import com.pxp.BullsAndCows.repository.UserRepository;
 import com.pxp.BullsAndCows.service.UserService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateUser(@PathVariable Long id, @RequestBody User user) {
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
@@ -48,7 +45,7 @@ public class UserController {
     public String averageTime(@PathVariable Long id){return userService.averageOfTime(id);}
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteUser(@PathVariable Long id) {
+    public List<User> deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
 }

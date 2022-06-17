@@ -1,50 +1,55 @@
 package com.pxp.BullsAndCows.entity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import org.hibernate.envers.AuditJoinTable;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 @Entity
+@Audited
+@AuditTable("T_GAME_AUDIT")
 public class Game {
 
     @Id
-    private int gameId;
+    private long gameId;
 
     private String trueComb;
 
-    private int idG;
+    private long idG;
 
-    private Date stopWatch;
+    private LocalDateTime stopWatch;
 
+    @AuditJoinTable(name = "T_GAME_COMBINATION_AUDIT",
+            inverseJoinColumns = @JoinColumn(name = "combination_id"))
     @OneToMany(cascade = CascadeType.ALL)
     private List<Combination> combination = new ArrayList<>();
 
-    public int getIdG() {
+    public long getIdG() {
         return idG;
     }
 
-    public void setIdG(int idG) {
+    public void setIdG(long idG) {
         this.idG = idG;
     }
 
-    public Date getStopWatch() {
+    public LocalDateTime getStopWatch() {
         return stopWatch;
     }
 
-    public void setStopWatch(Date stopWatch) {
+    public void setStopWatch(LocalDateTime stopWatch) {
         this.stopWatch = stopWatch;
     }
 
-    public int getGameId() {
+    public long getGameId() {
         return gameId;
     }
 
-    public void setGameId(int gameId) {
+    public void setGameId(long gameId) {
         this.gameId = gameId;
     }
 
@@ -65,7 +70,7 @@ public class Game {
     }
 
     public Game() {
-        stopWatch = new Date();
+        stopWatch = LocalDateTime.now();
         trueComb = CreateTrueCombination();
     }
 

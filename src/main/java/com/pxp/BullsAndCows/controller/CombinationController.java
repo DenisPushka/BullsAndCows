@@ -2,7 +2,6 @@ package com.pxp.BullsAndCows.controller;
 
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.service.CombinationService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class CombinationController {
     }
 
     @PostMapping
-    public ResponseEntity addCombination(@RequestBody Combination combination) {
+    public Combination addCombination(@RequestBody Combination combination) {
         return combinationService.addCombination(combination);
     }
 
@@ -33,7 +32,7 @@ public class CombinationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteCombination(@PathVariable Long id) {
+    public List<Combination> deleteCombination(@PathVariable Long id) {
         return combinationService.deleteCombination(id);
     }
 }

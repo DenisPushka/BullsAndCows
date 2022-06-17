@@ -1,24 +1,29 @@
 package com.pxp.BullsAndCows.entity;
 
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
+@Audited
+@AuditTable("T_COMBINATION_AUDIT")
 public class Combination {
 
     @Id
-    private int combinationId;
+    private long combinationId;
 
     private String combStep;
 
-    private String timeOfGame;
+    private LocalDateTime timeOfGame;
 
-    public int getCombinationId() {
+    public long getCombinationId() {
         return combinationId;
     }
 
-    public void setCombinationId(int combinationId) {
+    public void setCombinationId(long combinationId) {
         this.combinationId = combinationId;
     }
 
@@ -30,11 +35,11 @@ public class Combination {
         this.combStep = combStep;
     }
 
-    public String getTimeOfGame() {
+    public LocalDateTime getTimeOfGame() {
         return timeOfGame;
     }
 
-    public void setTimeOfGame(String timeOfGame) {
+    public void setTimeOfGame(LocalDateTime timeOfGame) {
         this.timeOfGame = timeOfGame;
     }
 

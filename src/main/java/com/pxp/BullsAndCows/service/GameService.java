@@ -3,11 +3,12 @@ package com.pxp.BullsAndCows.service;
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.repository.GameRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -21,13 +22,12 @@ public class GameService {
     }
 
     @Transactional
-    public ResponseEntity addGame(Game game) {
-        if (gameRepository.findMaxId() != null) {
+    public Game addGame(Game game) {
+        if (gameRepository.findMaxId() != null)
             game.setGameId(gameRepository.findMaxId() + 1);
-        }
 
-        var newGame = gameRepository.save(game);
-        return ResponseEntity.ok(newGame);
+        gameRepository.insertGame(game.getGameId(), game.getIdG(), game.getStopWatch(), game.getTrueComb());
+        return gameRepository.findGameById(game.getGameId());
     }
 
     public List<Game> getGames() {
@@ -39,7 +39,7 @@ public class GameService {
     }
 
     public Game getGame(Long id) {
-        return gameRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
+        return gameRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 
     @Transactional
@@ -47,8 +47,7 @@ public class GameService {
         var combination = new Combination();
         var game = getGame(id);
         combination.setCombStep(comb);
-        var a = getTime(game);
-        combination.setTimeOfGame(a);
+        combination.setTimeOfGame(getTime(game));
         combinationService.addCombination(combination);
         game.getCombination().add(combination);
         updateGame(id, game);
@@ -56,36 +55,53 @@ public class GameService {
         return game.processing(comb);
     }
 
-    private String getTime(Game game) {
-        var stopWatch = new Date();
-        var hour = Integer.toString(Math.abs(stopWatch.getHours() - game.getStopWatch().getHours()));
-        if (hour.length() == 1) hour = "0" + hour;
-        var min = Integer.toString(Math.abs(stopWatch.getMinutes() - game.getStopWatch().getMinutes()));
-        if (min.length() == 1) min = "0" + min;
-        var sec = Integer.toString(Math.abs(stopWatch.getSeconds() - game.getStopWatch().getSeconds()));
-        if (sec.length() == 1) sec = "0" + sec;
-        return hour + ":" + min + ":" + sec;
+    private LocalDateTime getTime(Game game) {
+        var ldt = game.getStopWatch();
+        var zdt = ldt.atZone(ZoneId.of("+05:00"));
+        long startTimeInMillis = zdt.toInstant().toEpochMilli();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        long endTimeInMillis = System.currentTimeMillis();
+        long secondAfterStart = (endTimeInMillis - startTimeInMillis) / 1000;
+
+        var hour = (int) secondAfterStart / 3600;
+//        if (hour.length() == 1) hour = "0" + hour;
+        var min = (int) secondAfterStart / 60 % 60;
+//        if (min.length() == 1) min = "0" + min;
+        var sec = (int) secondAfterStart / 1 % 60;
+//        if (sec.length() == 1) sec = "0" + sec;
+
+        var ld = LocalDate.now();
+        return ld.atTime(hour, min, sec);
     }
 
     @Transactional
-    public ResponseEntity updateGame(Long id, Game game) {
-        var currentGame = gameRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
+    public Game updateGame(Long id, Game game) {
+        var currentGame = gameRepository.findById(id).orElseThrow(RuntimeException::new);
         currentGame.setTrueComb(game.getTrueComb());
         currentGame.setCombination(game.getCombination());
-        currentGame = gameRepository.save(game);
+        gameRepository.save(currentGame);
 
-        return ResponseEntity.ok(currentGame);
+        return currentGame;
     }
 
     @Transactional
-    public ResponseEntity deleteGame(Long id) {
-        gameRepository.deleteById(Math.toIntExact(id));
-        return ResponseEntity.ok().build();
+    public List<Game> deleteGame(Long id) {
+        var com = getGame(id).getCombination();
+        for (var c : com)
+            combinationService.deleteCombination(c.getCombinationId());
+        gameRepository.deleteById(id);
+        return gameRepository.findAll();
     }
 
     @Transactional
-    public ResponseEntity deleteAllGames() {
+    public List<Game> deleteAllGames() {
         gameRepository.deleteAll();
-        return ResponseEntity.ok().build();
+        return gameRepository.findAll();
     }
 }

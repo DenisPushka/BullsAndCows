@@ -3,7 +3,6 @@ package com.pxp.BullsAndCows.service;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.entity.User;
 import com.pxp.BullsAndCows.repository.UserRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,14 +25,15 @@ public class UserService {
         if (userRepository.existsByNickname(user.getNickname())) {
             var buff = userRepository.findByNickname(user.getNickname());
             return buff.get(0);
-        }
-        else if (userRepository.findAll().size() == 0){
+        } else if (userRepository.findAll().size() == 0) {
             user.setId(0);
-            return userRepository.save(user);
+            userRepository.insertUser(user.getId(), user.getNickname());
+            return userRepository.findUserByName(user.getNickname());
         }
 
         user.setId(userRepository.findMaxId() + 1);
-        return userRepository.save(user);
+        userRepository.insertUser(user.getId(), user.getNickname());
+        return userRepository.findUserByName(user.getNickname());
     }
 
     public List<User> getUsers() {
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public User get(Long id) {
-        return userRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
+        return userRepository.findById(id).orElseThrow(RuntimeException::new);
     }
 
     @Transactional
@@ -56,29 +56,28 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity updateUser(Long id, User user) {
-        var currentUser = userRepository.findById(Math.toIntExact(id)).orElseThrow(RuntimeException::new);
+    public User updateUser(Long id, User user) {
+        var currentUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
         currentUser.setNickname(user.getNickname());
         currentUser.setGames(user.getGames());
         currentUser = userRepository.save(user);
 
-        return ResponseEntity.ok(currentUser);
+        return currentUser;
     }
 
     @Transactional
-    public ResponseEntity deleteUser(Long id) {
+    public List<User> deleteUser(Long id) {
         var game = get(id).getGames();
-        for (var i = 0; i < game.size(); i++) {
-            var g = game.get(i);
-            gameService.deleteGame((long) g.getGameId());
-        }
+        for (Game g : game)
+            gameService.deleteGame(g.getGameId());
         userRepository.save(get(id));
-        userRepository.deleteById(Math.toIntExact(id));
-        return ResponseEntity.ok().build();
+        userRepository.deleteById(id);
+
+        return userRepository.findAll();
     }
 
     @Transactional
-    public String averageOfTime(Long id){
+    public String averageOfTime(Long id) {
         return get(id).averageCombTime();
     }
 }

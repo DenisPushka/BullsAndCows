@@ -3,7 +3,6 @@ package com.pxp.BullsAndCows.controller;
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.service.GameService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class GameController {
     }
 
     @PostMapping
-    public ResponseEntity addGame(@RequestBody Game game) {
+    public Game addGame(@RequestBody Game game) {
         return gameService.addGame(game);
     }
 
@@ -39,12 +38,12 @@ public class GameController {
     public Game getLastGame(@PathVariable Long id){return gameService.getGame(id);}
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteGame(@PathVariable Long id) {
+    public List<Game> deleteGame(@PathVariable Long id) {
         return gameService.deleteGame(id);
     }
 
     @DeleteMapping("/deleteAllGames")
-    public ResponseEntity deleteAllGames() {
+    public List<Game> deleteAllGames() {
         return gameService.deleteAllGames();
     }
 }

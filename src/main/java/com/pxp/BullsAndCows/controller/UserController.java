@@ -3,6 +3,8 @@ package com.pxp.BullsAndCows.controller;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.entity.User;
 import com.pxp.BullsAndCows.service.UserService;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -48,4 +51,9 @@ public class UserController {
     public List<User> deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);
     }
+
+//    @GetMapping("/audit")
+//    public AuditReader auditReader(){
+//        AuditReader reader = AuditReaderFactory.get();
+//    }
 }

@@ -1,18 +1,23 @@
 package com.pxp.BullsAndCows.entity;
 
+import com.pxp.BullsAndCows.dao.GameDAO;
+import com.pxp.BullsAndCows.dao.GameDAOImpl;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.envers.AuditJoinTable;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Entity
-@Audited
-@AuditTable("T_GAME_AUDIT")
 public class Game {
 
     @Id
@@ -28,6 +33,7 @@ public class Game {
             inverseJoinColumns = @JoinColumn(name = "combination_id"))
     @OneToMany(cascade = CascadeType.ALL)
     private List<Combination> combination = new ArrayList<>();
+
 
     public long getIdG() {
         return idG;
@@ -71,31 +77,7 @@ public class Game {
 
     public Game() {
         stopWatch = LocalDateTime.now();
-        trueComb = CreateTrueCombination();
-    }
-
-    private String CreateTrueCombination() {
-        StringBuilder combination = new StringBuilder();
-        var rnd = new Random();
-        while (combination.length() != 4) {
-            var r = rnd.nextInt(10);
-            if (!combination.toString().contains(Integer.toString(r)))
-                combination.append(r);
-        }
-
-        return combination.toString();
-    }
-
-    public String processing(String combination) {
-        combination = combination.substring(13, 17);
-        int b = 0, k = 0;
-        for (var i = 0; i < trueComb.length(); i++)
-            if (trueComb.charAt(i) == combination.charAt(i))
-                b++;
-            else if (combination.indexOf(trueComb.charAt(i)) != -1)
-                k++;
-
-        return "\"" + b + "Б" + k + "К\"";
+        trueComb = new GameDAOImpl().CreateTrueCombination(); // CreateTrueCombination();
     }
 
     @Override

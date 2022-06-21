@@ -1,15 +1,24 @@
 package com.pxp.BullsAndCows.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-@Audited
-@AuditTable("T_COMBINATION_AUDIT")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
 public class Combination {
 
     @Id

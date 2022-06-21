@@ -1,5 +1,6 @@
 package com.pxp.BullsAndCows.service;
 
+import com.pxp.BullsAndCows.dao.UserDAOImpl;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.entity.User;
 import com.pxp.BullsAndCows.repository.UserRepository;
@@ -23,25 +24,24 @@ public class UserService {
     @Transactional
     public User createUser(User user) {
         if (userRepository.existsByNickname(user.getNickname())) {
-            var buff = userRepository.findByNickname(user.getNickname());
-            return buff.get(0);
+           return userRepository.findByNickname(user.getNickname());
         } else if (userRepository.findAll().size() == 0) {
             user.setId(0);
-            userRepository.insertUser(user.getId(), user.getNickname());
-            return userRepository.findUserByName(user.getNickname());
+           return userRepository.save(user);
         }
 
         user.setId(userRepository.findMaxId() + 1);
-        userRepository.insertUser(user.getId(), user.getNickname());
-        return userRepository.findUserByName(user.getNickname());
+        return userRepository.save(user);
     }
 
+    @Transactional
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User get(Long id) {
-        return userRepository.findById(id).orElseThrow(RuntimeException::new);
+        return userRepository.findByUserId(id);
     }
 
     @Transactional
@@ -60,9 +60,7 @@ public class UserService {
         var currentUser = userRepository.findById(id).orElseThrow(RuntimeException::new);
         currentUser.setNickname(user.getNickname());
         currentUser.setGames(user.getGames());
-        currentUser = userRepository.save(user);
-
-        return currentUser;
+        return userRepository.save(user);
     }
 
     @Transactional
@@ -78,6 +76,6 @@ public class UserService {
 
     @Transactional
     public String averageOfTime(Long id) {
-        return get(id).averageCombTime();
+        return new UserDAOImpl().averageCombTime(get(id));
     }
 }

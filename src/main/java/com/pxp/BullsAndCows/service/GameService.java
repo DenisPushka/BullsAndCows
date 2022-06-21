@@ -1,5 +1,6 @@
 package com.pxp.BullsAndCows.service;
 
+import com.pxp.BullsAndCows.dao.GameDAOImpl;
 import com.pxp.BullsAndCows.entity.Combination;
 import com.pxp.BullsAndCows.entity.Game;
 import com.pxp.BullsAndCows.repository.GameRepository;
@@ -52,7 +53,7 @@ public class GameService {
         game.getCombination().add(combination);
         updateGame(id, game);
 
-        return game.processing(comb);
+        return new GameDAOImpl().processing(comb,game);
     }
 
     private LocalDateTime getTime(Game game) {
@@ -70,11 +71,8 @@ public class GameService {
         long secondAfterStart = (endTimeInMillis - startTimeInMillis) / 1000;
 
         var hour = (int) secondAfterStart / 3600;
-//        if (hour.length() == 1) hour = "0" + hour;
         var min = (int) secondAfterStart / 60 % 60;
-//        if (min.length() == 1) min = "0" + min;
         var sec = (int) secondAfterStart / 1 % 60;
-//        if (sec.length() == 1) sec = "0" + sec;
 
         var ld = LocalDate.now();
         return ld.atTime(hour, min, sec);
